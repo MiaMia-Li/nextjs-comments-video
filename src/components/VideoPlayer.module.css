@@ -10,7 +10,7 @@
 .playerWrapper {
   position: relative;
   width: 100%;
-  padding-top: 90vh !important;
+  padding-top: 80vh !important;
 }
 
 .playerClickWrapper {
@@ -29,10 +29,10 @@
 }
 
 .controls {
-  position: absolute;
+  /* position: absolute;
   bottom: 0;
   left: 0;
-  right: 0;
+  right: 0; */
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -150,8 +150,6 @@
   border-radius: 50%;
 }
 
-/* 水平音量滑块 */
-/* 水平音量滑块 */
 .horizontalVolumeSlider {
   width: 60px;
   height: 24px;
@@ -292,11 +290,11 @@
 }
 
 .sliderAndComments {
-  position: absolute;
-  bottom: 40px; /* 调整为控制栏的高度，让进度条位于控制栏上方 */
+  /* position: absolute; */
+  bottom: 0; /* 调整为控制栏的高度，让进度条位于控制栏上方 */
   left: 0;
   right: 0;
-  height: 40px;
+  /* height: 40px; */
   padding: 0 16px;
   background-color: transparent; /* 改为透明，因为控制栏已经有背景色 */
   display: flex;

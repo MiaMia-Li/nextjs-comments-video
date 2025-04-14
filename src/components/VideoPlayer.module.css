@@ -1,190 +1,342 @@
+/* VideoPlayer.module.css */
 .videoPlayer {
-  --controls-height: 48px;
-
-  margin: 16px auto;
+  position: relative;
   width: 100%;
-  max-width: 1280px;
-  padding: 0 20px;
+  background-color: #000;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .playerWrapper {
   position: relative;
-  aspect-ratio: 16 / 9;
-  margin-bottom: 60px;
-  background-color: black;
+  width: 100%;
+  padding-top: 90vh !important;
 }
 
 .playerClickWrapper {
-  display: flex;
-  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  justify-content: center;
-  align-items: center;
+  height: 100%;
+  cursor: pointer;
 }
 
 .reactPlayer {
-  animation: fadeIn ease-out 0.3s;
-  animation-iteration-count: 1;
-  animation-fill-mode: forwards;
-}
-
-@keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-.videoBottom {
   position: absolute;
-}
-
-.sliderAndComments {
-  position: absolute;
-  right: 16px;
-  bottom: 0;
-  left: 16px;
-}
-
-.sliderComments {
-  position: absolute;
-  right: 0;
-  bottom: 0;
+  top: 0;
   left: 0;
-}
-
-.sliderRoot {
-  position: relative;
-  bottom: -8px;
-  flex: 1 1;
-  display: flex;
-  align-items: center;
-  user-select: none;
-  touch-action: none;
-  width: 100%;
-  height: 20px;
-  --track-height: 4px;
-}
-
-.sliderTrack {
-  background-color: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  position: relative;
-  flex-grow: 1;
-  height: var(--track-height);
-  cursor: pointer;
-}
-
-.sliderRange {
-  position: absolute;
-  background-color: var(--accent);
-  height: 100%;
-}
-
-.sliderThumb {
-  display: block;
-  width: 16px;
-  height: 16px;
-  background-color: var(--accent);
-  box-shadow:
-    0 1px 5px rgba(0, 0, 0, 0.1),
-    0 2px 10px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease-out;
-  border-radius: 10px;
-  cursor: pointer;
-}
-
-.sliderThumb:hover {
-  transform: scale(1.1);
-}
-
-.sliderThumb:focus {
-  outline: none;
-  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.2);
 }
 
 .controls {
   position: absolute;
-  height: var(--controls-height);
-  padding: 0 var(--spacing);
-  top: 100%;
+  bottom: 0;
   left: 0;
   right: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: var(--gray12);
+  padding: 0 16px;
+  height: 40px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  z-index: 10;
 }
 
-.controls > * {
-  color: var(--gray12);
-}
-
-@media (pointer: fine) {
-  .playerWrapper {
-    margin-bottom: 0;
-  }
-
-  .controls {
-    position: absolute;
-    top: auto;
-    bottom: 0;
-    background: linear-gradient(
-      180deg,
-      rgba(0, 0, 0, 0) 0%,
-      rgba(0, 0, 0, 0.8) 100%
-    );
-    opacity: 0;
-    transition: opacity ease-out 0.1s;
-  }
-
-  .playerWrapper:hover .controls {
-    opacity: 1;
-  }
-
-  .sliderAndComments {
-    bottom: 0;
-  }
-
-  .playerWrapper:hover .sliderAndComments {
-    bottom: var(--controls-height);
-  }
-
-  .sliderRoot {
-    height: var(--track-height);
-    bottom: 0;
-  }
-
-  .playerWrapper:hover .sliderRoot {
-    height: auto;
-  }
-
-  .sliderThumb {
-    display: none;
-  }
-
-  .playerWrapper:hover .sliderThumb {
-    display: block;
-  }
+.leftControls,
+.rightControls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .playButton,
-.fullscreenButton {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 10px;
+.muteButton,
+.fullscreenButton,
+.loopButton {
+  background: none;
+  border: none;
+  color: white;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+  min-width: 24px;
+  min-height: 24px;
+}
+
+.playButton:hover,
+.muteButton:hover,
+.fullscreenButton:hover,
+.loopButton:hover {
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .time {
   font-size: 14px;
-  user-select: none;
-  font-variant-numeric: tabular-nums;
+  margin: 0 12px;
+  white-space: nowrap;
 }
 
-.time > time:nth-child(2) {
-  color: var(--gray10);
+/* 控制元素容器 - 放在播放按钮右侧 */
+.controlsGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: 12px;
+}
+
+/* 音量控制 */
+.volumeControl {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 24px;
+}
+
+.volumeButton {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+}
+
+.volumeSliderContainer {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 100px;
+  background-color: rgba(0, 0, 0, 0.8);
+  border-radius: 4px;
+  padding: 8px;
+  display: flex;
+  justify-content: center;
+  z-index: 20;
+}
+
+.volumeSlider {
+  height: 80px;
+  width: 4px;
+}
+
+.volumeSliderTrack {
+  background-color: rgba(255, 255, 255, 0.3);
+  position: relative;
+  width: 4px;
+  height: 100%;
+  border-radius: 2px;
+}
+
+.volumeSliderRange {
+  position: absolute;
+  background-color: #3b82f6;
+  width: 100%;
+  border-radius: 2px;
+}
+
+.volumeSliderThumb {
+  display: block;
+  width: 12px;
+  height: 12px;
+  background-color: white;
+  border-radius: 50%;
+}
+
+/* 水平音量滑块 */
+/* 水平音量滑块 */
+.horizontalVolumeSlider {
+  width: 60px;
+  height: 24px;
+  margin-left: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.horizontalVolumeSliderTrack {
+  background-color: rgba(255, 255, 255, 0.3);
+  position: relative;
+  height: 4px;
+  width: 100%;
+  border-radius: 2px;
+}
+
+.volumeSliderRange {
+  position: absolute;
+  background-color: #3b82f6;
+  height: 100%;
+  left: 0;
+  border-radius: 2px;
+}
+
+.volumeSliderThumb {
+  display: block;
+  width: 12px;
+  height: 12px;
+  background-color: white;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.volumeControl {
+  display: flex;
+  align-items: center;
+  height: 24px;
+}
+
+.volumeButton {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  min-width: 24px;
+  min-height: 24px;
+}
+
+.volumeButton:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+}
+
+/* 速度控制 */
+.speedControl {
+  position: relative;
+  height: 24px;
+}
+
+.speedSelect {
+  background-color: transparent;
+  color: white;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 2px 4px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.speedSelect:focus {
+  outline: none;
+}
+
+/* 循环控制 */
+.loopButton {
+  color: white;
+}
+
+.loopActive {
+  color: #3b82f6;
+}
+
+/* 质量控制 */
+.qualityControl {
+  position: relative;
+  height: 24px;
+}
+
+.qualitySelect {
+  background-color: transparent;
+  color: white;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 2px 4px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.qualitySelect:focus {
+  outline: none;
+}
+
+/* 下拉菜单样式 */
+.dropdownMenu {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  border-radius: 4px;
+  padding: 8px 0;
+  min-width: 100px;
+  z-index: 20;
+}
+
+.dropdownItem {
+  padding: 4px 12px;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.dropdownItem:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.dropdownItemActive {
+  color: #3b82f6;
+}
+
+.sliderAndComments {
+  position: absolute;
+  bottom: 40px; /* 调整为控制栏的高度，让进度条位于控制栏上方 */
+  left: 0;
+  right: 0;
+  height: 40px;
+  padding: 0 16px;
+  background-color: transparent; /* 改为透明，因为控制栏已经有背景色 */
+  display: flex;
+  flex-direction: column;
+}
+
+.sliderComments {
+  position: relative;
+  height: 20px;
+  width: 100%;
+}
+
+.sliderRoot {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 20px;
+  touch-action: none;
+}
+
+.sliderTrack {
+  background-color: rgba(255, 255, 255, 0.3);
+  position: relative;
+  flex-grow: 1;
+  height: 4px;
+  border-radius: 2px;
+}
+
+.sliderRange {
+  position: absolute;
+  background-color: #3b82f6;
+  height: 100%;
+  border-radius: 2px;
+}
+
+.sliderThumb {
+  display: block;
+  width: 12px;
+  height: 12px;
+  background-color: white;
+  border-radius: 50%;
 }

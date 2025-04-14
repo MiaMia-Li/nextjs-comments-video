@@ -1,0 +1,32 @@
+{
+  "name": "@liveblocks-examples/nextjs-comments-video",
+  "description": "This example shows how to build a video editor with Liveblocks Comments, and Next.js.",
+  "license": "Apache-2.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@liveblocks/client": "^2.22.1",
+    "@liveblocks/node": "^2.22.1",
+    "@liveblocks/react": "^2.22.1",
+    "@liveblocks/react-ui": "^2.22.1",
+    "@radix-ui/react-slider": "^1.1.2",
+    "@radix-ui/react-tooltip": "^1.0.7",
+    "@types/node": "20.3.1",
+    "@types/react-dom": "18.2.5",
+    "next": "^13.5.4",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-error-boundary": "^4.0.11",
+    "react-player": "^2.13.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "prettier": "^3.3.2",
+    "typescript": "^5.4.5"
+  }
+}

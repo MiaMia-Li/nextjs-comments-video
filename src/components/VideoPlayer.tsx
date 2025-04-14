@@ -21,7 +21,11 @@ const SPEED_OPTIONS = [0.5, 0.75, 1, 1.5, 1.75, 2];
 // 质量选项
 const QUALITY_OPTIONS = ["Auto", "180p", "540p", "720p", "1080p"];
 
-export function VideoPlayer({ onStateChange }) {
+export function VideoPlayer({
+  onStateChange,
+}: {
+  onStateChange: (p: any) => void;
+}) {
   const player = useRef<ReactPlayer>(null);
   const playerWrapper = useRef(null);
   const playerClickWrapper = useRef<HTMLDivElement>(null);
@@ -53,11 +57,6 @@ export function VideoPlayer({ onStateChange }) {
     updateMyPresence({ state: playing ? "playing" : "paused" });
   }, [playing, seeking, updateMyPresence]);
 
-  // const getCurrentPercentage = useCallback(() => {
-  //   return time;
-  // }, [time]);
-
-  // 获取当前视频进度百分比
   const getCurrentPercentage = useCallback(() => {
     const time = player?.current?.getCurrentTime();
 
@@ -265,7 +264,7 @@ export function VideoPlayer({ onStateChange }) {
                   attributes: {
                     controlsList: "nodownload",
                   },
-                  quality: quality !== "Auto" ? quality : undefined,
+                  // quality: quality !== "Auto" ? quality : undefined,
                 },
               }}
             />

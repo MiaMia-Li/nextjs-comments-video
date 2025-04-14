@@ -9,7 +9,7 @@ import { NewThreadComposer } from "@/components/NewThreadComposer";
 import { useState } from "react";
 
 export default function Home() {
-  const [videoState, setVideoState] = useState(null);
+  const [videoState, setVideoState] = useState<any>(null);
 
   const handleVideoStateChange = (newState: any) => {
     setVideoState(newState);

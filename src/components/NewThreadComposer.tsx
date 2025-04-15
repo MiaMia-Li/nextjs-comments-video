@@ -10,7 +10,6 @@ import { formatTime } from "@/components/Duration";
 import { Mention } from "@/components/Mention";
 import { MentionSuggestions } from "@/components/MentionSuggestions";
 import { Link } from "@/components/Link";
-import styles from "./NewThreadComposer.module.css";
 import { TimeIcon } from "@/icons/Time";
 
 type Props = {
@@ -62,11 +61,24 @@ export function NewThreadComposer({
   );
 
   return (
-    <Composer.Form onComposerSubmit={handleSubmit} className={styles.wrapper}>
-      <div className={styles.composer}>
+    <Composer.Form
+      onComposerSubmit={handleSubmit}
+      className="
+        w-full 
+        my-8 
+        mx-auto 
+        max-w-[680px] 
+        bg-gray-2 
+        p-4 
+        border 
+        border-gray-4 
+        rounded-base
+      "
+    >
+      <div className="flex gap-4 items-start">
         {currentUser && (
           <img
-            className={styles.composerAvatar}
+            className="flex-shrink-0 rounded-full"
             width={24}
             height={24}
             src={currentUser.info.avatar}
@@ -74,7 +86,13 @@ export function NewThreadComposer({
           />
         )}
         <Composer.Editor
-          className={styles.composerEditor}
+          className="
+            w-full 
+            pt-1 
+            outline-none 
+           [&_[data-placeholder]]:text-gray-9
+    text-gray-12
+          "
           placeholder="Add comment…"
           onFocus={handleFocus}
           onKeyDown={handleKeyDown}
@@ -93,21 +111,77 @@ export function NewThreadComposer({
           }}
         />
       </div>
-      <div className={styles.options}>
-        <label htmlFor="attach-time" className={styles.optionsTime}>
-          <span>
+      <div
+        className="
+        mt-5 
+        flex 
+        justify-between 
+        items-center 
+        gap-3
+      "
+      >
+        <label
+          htmlFor="attach-time"
+          className="
+            h-7 
+            bg-accent-background 
+            text-accent 
+            inline-flex 
+            gap-1 
+            px-1.5 
+            items-center 
+            text-base
+            rounded-[4px] 
+            font-tabular-nums 
+            transition-colors 
+            duration-150 
+            ease-out 
+            cursor-pointer 
+            select-none 
+            hover:bg-accent-background-hover
+          "
+        >
+          <span className="inline-flex gap-1.5 items-center">
             <TimeIcon />
             {formatTime(time)}
           </span>
           <input
             id="attach-time"
-            className={styles.checkbox}
+            className="
+              accent-accent 
+              cursor-pointer
+            "
             type="checkbox"
             checked={attachTime}
             onChange={handleCheckboxChecked}
           />
         </label>
-        <Composer.Submit className="button">Comment</Composer.Submit>
+        <Composer.Submit
+          className="
+    bg-accent 
+    text-accent-contrast 
+    px-3 
+    py-2 
+    rounded-lg 
+    hover:bg-accent-hover
+    whitespace-nowrap
+    text-[13px]
+    font-medium
+    font-sans
+    cursor-pointer
+    transition-all
+    duration-150
+    ease-out
+    focus:outline-none
+    focus:ring-2
+    focus:ring-accent/50
+    disabled:bg-gray-3
+    disabled:text-gray-8
+    disabled:cursor-not-allowed
+  "
+        >
+          Comment
+        </Composer.Submit>
       </div>
     </Composer.Form>
   );

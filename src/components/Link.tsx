@@ -9,7 +9,7 @@ export function Link({
   children,
 }: ComposerEditorLinkProps | CommentBodyLinkProps) {
   return (
-    <a href={href} className={styles.link}>
+    <a href={href} className="font-medium">
       {children}
     </a>
   );

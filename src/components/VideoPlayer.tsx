@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import ReactPlayer from "react-player";
 import { OnProgressProps } from "react-player/base";
 import * as Slider from "@radix-ui/react-slider";
-import styles from "./VideoPlayer.module.css";
 import { PlayIcon } from "@/icons/Play";
 import { PauseIcon } from "@/icons/Pause";
 import { FullscreenIcon } from "@/icons/Fullscreen";
@@ -212,10 +211,8 @@ export function VideoPlayer({
     const handleClickOutside = (event: MouseEvent) => {
       if (showSpeedMenu || showQualityMenu) {
         const target = event.target as Node;
-        const speedControl = document.querySelector(`.${styles.speedControl}`);
-        const qualityControl = document.querySelector(
-          `.${styles.qualityControl}`
-        );
+        const speedControl = document.querySelector(".speed-control");
+        const qualityControl = document.querySelector(".quality-control");
 
         if (speedControl && !speedControl.contains(target)) {
           setShowSpeedMenu(false);
@@ -233,271 +230,299 @@ export function VideoPlayer({
     };
   }, [showSpeedMenu, showQualityMenu]);
 
+  // 第二部分代码将在下一个回复中展示
   return (
-    <div className={styles.videoPlayer}>
-      <div className={styles.playerWrapper} ref={playerWrapper}>
-        {/* Video player */}
+    <div className="relative w-full bg-black rounded-lg overflow-hidden">
+      <div className="relative w-full">
+        {/* 内容区 */}
         <div
           ref={playerClickWrapper}
-          className={styles.playerClickWrapper}
-          onClick={() => setPlaying(!playing)}
-          onDoubleClick={handleFullscreen}
+          className="relative w-full pt-[80vh] bg-black" // 16:9 aspect ratio
         >
           <ClientSideSuspense fallback={null}>
             <ReactPlayer
               ref={player}
               width="100%"
-              height="80vh"
+              height="100%"
+              url="https://cdn-staging.tryatria.com/adfiles/igDHgKAD7NB2a_BqAKl5Ve2KE.mp4"
               playing={playing}
               playbackRate={playbackSpeed}
               volume={volume}
               muted={muted}
               loop={loop}
-              onDuration={setDuration}
               onProgress={handleProgress}
               onEnded={handleEnded}
-              // url="https://nextjs-comments-audio.liveblocks.app/titanium-170190.mp3"
-              url="https://cdn-staging.tryatria.com/adfiles/igDHgKAD7NB2a_BqAKl5Ve2KE.mp4"
-              className={styles.reactPlayer}
-              config={{
-                file: {
-                  attributes: {
-                    controlsList: "nodownload",
-                  },
-                  // quality: quality !== "Auto" ? quality : undefined,
-                },
-              }}
+              onDuration={setDuration}
+              className="absolute top-0 left-0"
+              onClick={() => setPlaying(!playing)}
+              onDoubleClick={handleFullscreen}
             />
           </ClientSideSuspense>
-        </div>
 
-        <div className={styles.sliderAndComments}>
-          {/* 视频时间轴上的评论 */}
-          <div className={styles.sliderComments}>
-            <ThreadsTimeline />
+          {/* Timeline */}
+          <div className="absolute bottom-0 left-0 right-0 px-4 flex flex-col bg-transparent">
+            <div className="relative h-[20px] w-full">
+              <ThreadsTimeline />
+            </div>
+            <div className="w-full h-1 bg-gray-800/50">
+              <Slider.Root
+                className="relative flex items-center h-full w-full"
+                value={[time]}
+                onValueChange={handleSliderChange}
+                onValueCommit={handleSliderCommit}
+                max={1}
+                step={0.0001}
+              >
+                <Slider.Track className="bg-white/30 relative grow rounded-full h-full">
+                  <Slider.Range className="absolute bg-blue-500 rounded-full h-full" />
+                </Slider.Track>
+                <Slider.Thumb className="block w-3 h-3 bg-white rounded-full shadow-lg" />
+              </Slider.Root>
+            </div>
           </div>
-
-          {/* 视频进度条 */}
-          <Slider.Root
-            className={styles.sliderRoot}
-            min={0}
-            max={0.999999}
-            step={0.001}
-            value={[time]}
-            onValueChange={handleSliderChange}
-            onValueCommit={handleSliderCommit}
-          >
-            <Slider.Track className={styles.sliderTrack}>
-              <Slider.Range className={styles.sliderRange} />
-            </Slider.Track>
-            <Slider.Thumb className={styles.sliderThumb} />
-          </Slider.Root>
         </div>
-      </div>
 
-      <div className={styles.controls}>
-        <div className={styles.leftControls}>
-          <button
-            className={styles.playButton}
-            onClick={() => setPlaying(!playing)}
-            // title={playing ? "暂停" : "播放"}
-          >
-            {playing ? <PauseIcon /> : <PlayIcon />}
-          </button>
+        {/* 进度条 */}
 
-          <div className={styles.controlsGroup}>
-            {/* 循环播放按钮 */}
+        {/* 视频设置区 */}
+        <div className="flex justify-between items-center px-4 py-2 bg-black/70 text-white">
+          {/* 左侧控制区 */}
+          <div className="flex items-center gap-3">
             <button
-              className={`${styles.loopButton} ${loop ? styles.loopActive : ""}`}
-              onClick={toggleLoop}
-              // title="循环播放"
+              className="bg-transparent border-none text-white cursor-pointer flex items-center justify-center p-1 rounded-full transition-colors hover:bg-white/20 min-w-6 min-h-6"
+              onClick={() => setPlaying(!playing)}
             >
-              ↻
+              {playing ? <PauseIcon /> : <PlayIcon />}
             </button>
 
-            <div className={styles.speedControl}>
+            <div className="flex items-center gap-3 ml-3">
+              {/* 音量控制 */}
+              <div className="relative h-6 group">
+                <button
+                  className="bg-transparent border-none text-white cursor-pointer flex items-center justify-center p-1 rounded-full transition-colors hover:bg-white/20 min-w-6 min-h-6"
+                  onClick={toggleMute}
+                >
+                  {muted ? (
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      {/* 静音图标 */}
+                    </svg>
+                  ) : (
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      {/* 音量图标 */}
+                    </svg>
+                  )}
+                </button>
+
+                {/* 音量滑块 */}
+                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 h-24 bg-black/80 rounded p-2 hidden group-hover:flex justify-center z-20">
+                  <Slider.Root
+                    className="relative flex items-center h-20 w-1.5"
+                    value={[volume]}
+                    onValueChange={handleVolumeChange}
+                    max={1}
+                    step={0.1}
+                    orientation="vertical"
+                  >
+                    <Slider.Track className="bg-white/30 relative grow rounded-full h-full">
+                      <Slider.Range className="absolute bg-blue-500 rounded-full h-full" />
+                    </Slider.Track>
+                    <Slider.Thumb className="block w-3 h-3 bg-white rounded-full shadow-lg" />
+                  </Slider.Root>
+                </div>
+              </div>
+
+              {/* 水平音量滑块 */}
+              <div className="w-16 h-6 flex items-center">
+                <Slider.Root
+                  className="relative flex items-center h-1.5 w-full"
+                  value={[volume]}
+                  onValueChange={handleVolumeChange}
+                  max={1}
+                  step={0.1}
+                >
+                  <Slider.Track className="bg-white/30 relative grow rounded-full h-full">
+                    <Slider.Range className="absolute bg-blue-500 rounded-full h-full" />
+                  </Slider.Track>
+                  <Slider.Thumb className="block w-3 h-3 bg-white rounded-full shadow-lg" />
+                </Slider.Root>
+              </div>
+            </div>
+
+            {/* 时间显示 */}
+            <div className="flex items-center gap-1.5 text-sm">
+              <Duration seconds={duration * time} />
+              <span>/</span>
+              <Duration seconds={duration} />
+            </div>
+          </div>
+
+          {/* 右侧控制区 */}
+          <div className="flex items-center gap-3">
+            {/* 播放速度控制 */}
+            <div className="relative h-6 speed-control">
               <button
-                className={styles.speedSelect}
+                className="bg-transparent border-none text-white cursor-pointer flex items-center justify-center p-1 rounded-full transition-colors hover:bg-white/20 min-w-6 min-h-6"
                 onClick={() => setShowSpeedMenu(!showSpeedMenu)}
-                // title="播放速度"
               >
                 {playbackSpeed}x
               </button>
-
               {showSpeedMenu && (
-                <div className={styles.dropdownMenu}>
+                <div className="absolute bottom-8 left-0 bg-black/80 rounded p-1 z-50">
                   {SPEED_OPTIONS.map((speed) => (
-                    <div
+                    <button
                       key={speed}
-                      className={`${styles.dropdownItem} ${playbackSpeed === speed ? styles.dropdownItemActive : ""}`}
+                      className={`
+                    block 
+                    w-full 
+                    px-2 
+                    py-1 
+                    text-sm 
+                    text-left 
+                    rounded 
+                    hover:bg-white/20 
+                    ${speed === playbackSpeed ? "text-blue-500" : "text-white"}
+                  `}
                       onClick={() => handleSpeedChange(speed)}
                     >
                       {speed}x
-                    </div>
+                    </button>
                   ))}
                 </div>
               )}
-            </div>
-
-            <div className={styles.volumeControl}>
-              <button
-                className={styles.volumeButton}
-                onClick={toggleMute}
-                // title={muted ? "取消静音" : "静音"}
-              >
-                {muted ? (
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M16.5 12C16.5 10.23 15.48 8.71 14 7.97V10.18L16.45 12.63C16.48 12.43 16.5 12.22 16.5 12Z"
-                      fill="currentColor"
-                    />
-                    <path
-                      d="M19 12C19 12.94 18.8 13.82 18.46 14.64L19.97 16.15C20.63 14.91 21 13.5 21 12C21 7.72 18.01 4.14 14 3.23V5.29C16.89 6.15 19 8.83 19 12Z"
-                      fill="currentColor"
-                    />
-                    <path
-                      d="M4.27 3L3 4.27L7.73 9H3V15H7L12 20V13.27L16.25 17.52C15.58 18.04 14.83 18.45 14 18.7V20.76C15.38 20.45 16.63 19.81 17.69 18.95L19.73 21L21 19.73L12 10.73L4.27 3ZM12 4L9.91 6.09L12 8.18V4Z"
-                      fill="currentColor"
-                    />
-                  </svg>
-                ) : volume > 0.5 ? (
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M3 9V15H7L12 20V4L7 9H3ZM16.5 12C16.5 10.23 15.48 8.71 14 7.97V16.02C15.48 15.29 16.5 13.77 16.5 12ZM14 3.23V5.29C16.89 6.15 19 8.83 19 12C19 15.17 16.89 17.85 14 18.71V20.77C18.01 19.86 21 16.28 21 12C21 7.72 18.01 4.14 14 3.23Z"
-                      fill="currentColor"
-                    />
-                  </svg>
-                ) : volume > 0 ? (
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M3 9V15H7L12 20V4L7 9H3ZM14 7.97V16.02C15.48 15.29 16.5 13.77 16.5 12C16.5 10.23 15.48 8.71 14 7.97Z"
-                      fill="currentColor"
-                    />
-                  </svg>
-                ) : (
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path d="M7 9V15H11L16 20V4L11 9H7Z" fill="currentColor" />
-                  </svg>
-                )}
-              </button>
-
-              <Slider.Root
-                className={styles.horizontalVolumeSlider}
-                min={0}
-                max={1}
-                step={0.01}
-                value={[muted ? 0 : volume]}
-                onValueChange={handleVolumeChange}
-              >
-                <Slider.Track className={styles.horizontalVolumeSliderTrack}>
-                  <Slider.Range className={styles.volumeSliderRange} />
-                </Slider.Track>
-                <Slider.Thumb className={styles.volumeSliderThumb} />
-              </Slider.Root>
             </div>
 
             {/* 视频质量控制 */}
-            <div className={styles.qualityControl}>
+            <div className="relative h-6 quality-control">
               <button
-                className={styles.qualitySelect}
+                className="bg-transparent border-none text-white cursor-pointer flex items-center justify-center p-1 rounded-full transition-colors hover:bg-white/20 min-w-6 min-h-6"
                 onClick={() => setShowQualityMenu(!showQualityMenu)}
-                // title="视频质量"
               >
                 {quality}
               </button>
-
               {showQualityMenu && (
-                <div className={styles.dropdownMenu}>
+                <div className="absolute bottom-8 left-0 bg-black/80 rounded p-1 z-50">
                   {QUALITY_OPTIONS.map((q) => (
-                    <div
+                    <button
                       key={q}
-                      className={`${styles.dropdownItem} ${quality === q ? styles.dropdownItemActive : ""}`}
+                      className={`
+                    block 
+                    w-full 
+                    px-2 
+                    py-1 
+                    text-sm 
+                    text-left 
+                    rounded 
+                    hover:bg-white/20 
+                    ${q === quality ? "text-blue-500" : "text-white"}
+                  `}
                       onClick={() => handleQualityChange(q)}
                     >
                       {q}
-                    </div>
+                    </button>
                   ))}
                 </div>
               )}
             </div>
+
+            {/* 循环播放 */}
+            <button
+              className={`
+            bg-transparent 
+            border-none 
+            cursor-pointer 
+            flex 
+            items-center 
+            justify-center 
+            p-1 
+            rounded-full 
+            transition-colors 
+            hover:bg-white/20 
+            min-w-6 
+            min-h-6 
+            ${loop ? "text-blue-500" : "text-white"}
+          `}
+              onClick={toggleLoop}
+            >
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
+              </svg>
+            </button>
+
+            {/* 全屏切换 */}
+            <button
+              className="bg-transparent border-none text-white cursor-pointer flex items-center justify-center p-1 rounded-full transition-colors hover:bg-white/20 min-w-6 min-h-6"
+              onClick={handleFullscreen}
+            >
+              {fullscreen ? <ExitFullscreenIcon /> : <FullscreenIcon />}
+            </button>
           </div>
-
-          {/* 时间显示 */}
-          {player.current ? (
-            <div className={styles.time}>
-              <Duration seconds={duration * time} /> /{" "}
-              <Duration seconds={duration} />
-            </div>
-          ) : null}
-        </div>
-
-        <div className={styles.rightControls}>
-          {/* 全屏按钮 */}
-          <button
-            className={styles.fullscreenButton}
-            onClick={handleFullscreen}
-            // title={fullscreen ? "退出全屏" : "全屏"}
-          >
-            {fullscreen ? <ExitFullscreenIcon /> : <FullscreenIcon />}
-          </button>
         </div>
       </div>
-
-      {/* 添加评论组件 */}
-      {/* <ClientSideSuspense fallback={null}>
-        <NewThreadComposer
-          getCurrentPercentage={getCurrentPercentage}
-          setPlaying={setPlaying}
-          time={duration * time}
-        />
-      </ClientSideSuspense> */}
     </div>
   );
 }
 
 function requestFullscreen(element: HTMLElement | null) {
-  if (!(element instanceof HTMLElement)) {
+  if (!element) {
     return false;
   }
 
-  const rfs =
-    element.requestFullscreen ||
-    (element as any).webkitRequestFullScreen ||
-    (element as any).mozRequestFullScreen ||
-    (element as any).msRequestFullscreen;
-  rfs.call(element);
+  if (element.requestFullscreen) {
+    element.requestFullscreen();
+    return true;
+  }
 
-  return true;
+  // @ts-ignore
+  if (element.webkitRequestFullscreen) {
+    // @ts-ignore
+    element.webkitRequestFullscreen();
+    return true;
+  }
+
+  // @ts-ignore
+  if (element.msRequestFullscreen) {
+    // @ts-ignore
+    element.msRequestFullscreen();
+    return true;
+  }
+
+  return false;
 }
 
 function exitFullscreen() {
-  if (document.fullscreenElement === null) {
-    return;
+  if (document.exitFullscreen) {
+    document.exitFullscreen();
   }
-
-  document.exitFullscreen();
+  // @ts-ignore
+  else if (document.webkitExitFullscreen) {
+    // @ts-ignore
+    document.webkitExitFullscreen();
+  }
+  // @ts-ignore
+  else if (document.msExitFullscreen) {
+    // @ts-ignore
+    document.msExitFullscreen();
+  }
 }
+
+export default VideoPlayer;

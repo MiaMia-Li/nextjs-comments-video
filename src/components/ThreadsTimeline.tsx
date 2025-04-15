@@ -3,7 +3,6 @@
 import { useThreads, useUser } from "@liveblocks/react/suspense";
 import { ClientSideSuspense } from "@liveblocks/react";
 import { ErrorBoundary } from "react-error-boundary";
-import styles from "./ThreadsTimeline.module.css";
 import { ThreadData } from "@liveblocks/core";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { Comment } from "@liveblocks/react-ui/primitives";
@@ -19,7 +18,6 @@ import { useState } from "react";
 
 export function ThreadsTimeline() {
   return (
-    // @ts-ignore
     <ErrorBoundary fallback={<div>Error</div>}>
       <ClientSideSuspense fallback={null}>
         <PinnedThreads />
@@ -32,7 +30,7 @@ function PinnedThreads() {
   const { threads } = useThreads();
 
   return (
-    <div className={styles.pinnedThreads}>
+    <div className="w-full mb-2.5">
       {threads.map((thread) => (
         <PinnedThread key={thread.id} thread={thread} />
       ))}
@@ -45,7 +43,6 @@ function PinnedThread({ thread }: { thread: ThreadData }) {
   const highlightThread = useHighlightThread(thread.id);
   const [highlightedPin, setHighlightedPin] = useState(false);
 
-  // On highlight event, highlight this pin
   useHighlightPinListener((threadId) => {
     if (thread.id !== threadId) {
       setHighlightedPin(false);
@@ -56,14 +53,23 @@ function PinnedThread({ thread }: { thread: ThreadData }) {
     setTimeout(() => setHighlightedPin(true));
   });
 
-  // Not intended to be on the timeline, or all comments deleted
   if (thread.metadata.time === -1 || !thread.comments.length) {
     return null;
   }
 
   return (
     <div
-      className={styles.pinnedThread}
+      className="
+        absolute 
+        bottom-0 
+        cursor-pointer 
+        -translate-x-1/2 
+        origin-center-bottom 
+        transition-transform 
+        duration-100 
+        ease-out
+        data-[highlight]:scale-[1.2]
+      "
       onClick={highlightThread}
       onPointerEnter={highlightThread}
       onPointerLeave={resetAllHighlights}
@@ -72,17 +78,40 @@ function PinnedThread({ thread }: { thread: ThreadData }) {
     >
       <Tooltip.Root>
         <Tooltip.Trigger>
-          <div className={styles.avatarPin}>
-            <img src={user.avatar} alt={user.name} />
+          <div className="cursor-pointer select-none">
+            <img
+              src={user.avatar}
+              alt={user.name}
+              className="w-[20px] h-[20px] rounded-full"
+            />
           </div>
         </Tooltip.Trigger>
-        <Tooltip.Content className={styles.tooltip}>
-          <div className={styles.tooltipHeader}>
-            <img src={user.avatar} alt="" />
+        <Tooltip.Content
+          className="
+           font-medium
+            select-none 
+            bg-gray-2
+            text-gray-12
+            p-2 
+            rounded-[var(--border-radius)] 
+            mb-2 
+            whitespace-nowrap 
+            max-w-[200px] 
+            text-base
+          "
+        >
+          <div className="flex gap-1.5 items-center font-medium">
+            <img
+              src={user.avatar}
+              alt=""
+              className="w-[20px] h-[20px] rounded-full"
+            />
             {user.name}
           </div>
-          <div className={styles.tooltipBody}>
-            <span>{formatTime(thread.metadata.time) + " "}</span>
+          <div className="mt-2">
+            <span className="text-accent">
+              {formatTime(thread.metadata.time) + " "}
+            </span>
             <Comment.Body
               body={thread.comments[0].body}
               components={{
@@ -97,6 +126,7 @@ function PinnedThread({ thread }: { thread: ThreadData }) {
                   </Comment.Link>
                 ),
               }}
+              className="inline-block"
             />
           </div>
         </Tooltip.Content>
@@ -104,3 +134,5 @@ function PinnedThread({ thread }: { thread: ThreadData }) {
     </div>
   );
 }
+
+export default ThreadsTimeline;

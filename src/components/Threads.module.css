@@ -39,8 +39,8 @@
 
 .threadTime {
   height: 28px;
-  background-color: var(--accent-background);
-  color: var(--accent);
+  background-color: #f66c301a;
+  color: #f66c30;
   display: inline-flex;
   gap: 6px;
   margin: var(--spacing) 0 0 var(--spacing);
@@ -56,5 +56,5 @@
 
 .threadTime:hover,
 .threadTime:focus {
-  background-color: var(--accent-background-hover);
+  background-color: #f66c3029;
 }

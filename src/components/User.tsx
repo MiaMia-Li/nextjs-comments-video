@@ -5,7 +5,7 @@ interface UserProps extends ComponentProps<"span"> {
   userId: string;
 }
 
-export function User({ userId, className, ...props }: UserProps) {
+export function User({ userId, ...props }: UserProps) {
   const { user } = useUser(userId);
 
   return <span {...props}>{user?.name ?? userId}</span>;

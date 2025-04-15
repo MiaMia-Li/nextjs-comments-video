@@ -15,6 +15,7 @@ import { formatTime } from "@/components/Duration";
 import { Mention } from "@/components/Mention";
 import { Link } from "@/components/Link";
 import { useState } from "react";
+import { useParams } from "next/navigation";
 
 export function ThreadsTimeline() {
   return (
@@ -28,10 +29,17 @@ export function ThreadsTimeline() {
 
 function PinnedThreads() {
   const { threads } = useThreads();
+  const params = useParams();
+  const resourceId = params.id;
+
+  // 根据 resourceId 过滤线程
+  const filteredThreads = threads.filter(
+    (thread) => thread.metadata.resourceId === resourceId
+  );
 
   return (
     <div className="w-full mb-2.5">
-      {threads.map((thread) => (
+      {filteredThreads.map((thread) => (
         <PinnedThread key={thread.id} thread={thread} />
       ))}
     </div>
@@ -53,6 +61,7 @@ function PinnedThread({ thread }: { thread: ThreadData }) {
     setTimeout(() => setHighlightedPin(true));
   });
 
+  // 检查 time 和评论是否存在，同时确保 resourceId 匹配
   if (thread.metadata.time === -1 || !thread.comments.length) {
     return null;
   }

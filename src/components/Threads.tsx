@@ -14,17 +14,21 @@ import {
 import { ThreadData } from "@liveblocks/core";
 import { formatTime } from "@/components/Duration";
 import { TimeIcon } from "@/icons/Time";
+import { Loading } from "./Loading";
 
-export function Threads() {
+export function Threads({ resourceId }: { resourceId: string }) {
   return (
-    <ClientSideSuspense fallback={null}>
-      <ThreadList />
+    <ClientSideSuspense fallback={<Loading />}>
+      <ThreadList resourceId={resourceId} />
     </ClientSideSuspense>
   );
 }
 
-function ThreadList() {
+function ThreadList({ resourceId }: { resourceId: string }) {
   const { threads } = useThreads();
+  const filteredThreads = threads.filter(
+    (thread) => thread.metadata.resourceId === resourceId
+  );
 
   if (threads.length === 0) {
     return <div className={styles.emptyState}>No comments yet!</div>;
@@ -32,7 +36,7 @@ function ThreadList() {
 
   return (
     <>
-      {threads.sort(sortThreads).map((thread) => (
+      {filteredThreads.sort(sortThreads).map((thread) => (
         <CustomThread key={thread.id} thread={thread} />
       ))}
     </>
@@ -41,7 +45,9 @@ function ThreadList() {
 
 function CustomThread({ thread }: { thread: ThreadData }) {
   const ref = useRef<HTMLDivElement>(null);
-  const threadHasTime = thread.metadata.timePercentage !== -1;
+  const threadHasTime =
+    thread.metadata.timePercentage !== -1 &&
+    thread.metadata.resourceType !== "image";
   const skipTo = useSkipTo();
   const highlightPin = useHighlightPin(thread.id);
 

@@ -18,6 +18,8 @@ declare global {
     };
     // Custom metadata set on threads, for useThreads, useCreateThread, etc.
     ThreadMetadata: {
+      resourceId: string;
+      resourceType: string;
       time: number | -1;
       timePercentage: number | -1;
     };

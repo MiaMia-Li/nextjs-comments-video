@@ -11,17 +11,22 @@ import { Mention } from "@/components/Mention";
 import { MentionSuggestions } from "@/components/MentionSuggestions";
 import { Link } from "@/components/Link";
 import { TimeIcon } from "@/icons/Time";
+import { useParams } from "next/navigation";
 
 type Props = {
-  getCurrentPercentage: () => number;
-  setPlaying: (vale: boolean) => void;
-  time: number;
+  getCurrentPercentage?: () => number;
+  setPlaying?: (vale: boolean) => void;
+  time?: number;
+  resourceId: string;
+  resourceType: string;
 };
 
 export function NewThreadComposer({
-  getCurrentPercentage,
+  getCurrentPercentage = () => -1,
   setPlaying,
-  time,
+  time = -1,
+  resourceId,
+  resourceType,
 }: Props) {
   const currentUser = useSelf();
   const createThread = useCreateThread();
@@ -35,6 +40,8 @@ export function NewThreadComposer({
       createThread({
         body,
         metadata: {
+          resourceType,
+          resourceId,
           time: attachTime ? time : -1,
           timePercentage: attachTime ? getCurrentPercentage() : -1,
         },
@@ -45,7 +52,7 @@ export function NewThreadComposer({
 
   // Pause video on focus
   const handleFocus = useCallback(() => {
-    setPlaying(false);
+    setPlaying && setPlaying(false);
   }, []);
 
   // Stop keyboard events firing on window when typing (i.e. prevent fullscreen with `f`)
@@ -120,9 +127,11 @@ export function NewThreadComposer({
         gap-3
       "
       >
-        <label
-          htmlFor="attach-time"
-          className="
+        {resourceType !== "image" && (
+          <label
+            htmlFor="attach-time"
+            className="
+            
             h-7 
             bg-accent-background 
             text-accent 
@@ -140,22 +149,24 @@ export function NewThreadComposer({
             select-none 
             hover:bg-accent-background-hover
           "
-        >
-          <span className="inline-flex gap-1.5 items-center">
-            <TimeIcon />
-            {formatTime(time)}
-          </span>
-          <input
-            id="attach-time"
-            className="
+          >
+            <span className="inline-flex gap-1.5 items-center">
+              <TimeIcon />
+              {formatTime(time)}
+            </span>
+
+            <input
+              id="attach-time"
+              className="
               accent-accent 
               cursor-pointer
             "
-            type="checkbox"
-            checked={attachTime}
-            onChange={handleCheckboxChecked}
-          />
-        </label>
+              type="checkbox"
+              checked={attachTime}
+              onChange={handleCheckboxChecked}
+            />
+          </label>
+        )}
         <Composer.Submit
           className="
     bg-accent 

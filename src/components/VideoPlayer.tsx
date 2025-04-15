@@ -22,8 +22,10 @@ const QUALITY_OPTIONS = ["Auto", "180p", "540p", "720p", "1080p"];
 
 export function VideoPlayer({
   onStateChange,
+  src,
 }: {
   onStateChange: (p: any) => void;
+  src: string;
 }) {
   const player = useRef<ReactPlayer>(null);
   const playerWrapper = useRef(null);
@@ -230,11 +232,9 @@ export function VideoPlayer({
     };
   }, [showSpeedMenu, showQualityMenu]);
 
-  // 第二部分代码将在下一个回复中展示
   return (
     <div className="relative w-full bg-black rounded-lg overflow-hidden">
       <div className="relative w-full">
-        {/* 内容区 */}
         <div
           ref={playerClickWrapper}
           className="relative w-full pt-[80vh] bg-black" // 16:9 aspect ratio
@@ -244,7 +244,7 @@ export function VideoPlayer({
               ref={player}
               width="100%"
               height="100%"
-              url="https://cdn-staging.tryatria.com/adfiles/igDHgKAD7NB2a_BqAKl5Ve2KE.mp4"
+              url={src}
               playing={playing}
               playbackRate={playbackSpeed}
               volume={volume}

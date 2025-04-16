@@ -34,7 +34,6 @@ export default function Home() {
   ];
 
   // url:a/:id
-  const router = useRouter();
   const params = useParams();
   const id = params.id;
   const [currentResourceIndex, setCurrentResourceIndex] = useState(() =>
@@ -88,12 +87,12 @@ export default function Home() {
               </header>
 
               <main className="flex-1 flex min-h-0 relative">
-                <div className="flex-1 overflow-y-auto relative">
+                <div className="flex-1 overflow-y-auto relative flex flex-col">
                   <VideoPlayer
                     src={currentResource.url}
                     onStateChange={handleVideoStateChange}
                   />
-                  <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-4">
+                  <div className="flex justify-center items-center gap-10">
                     <button
                       onClick={() => navigateResource("prev")}
                       className="bg-gray-3 hover:bg-gray-4 p-2 rounded-full"

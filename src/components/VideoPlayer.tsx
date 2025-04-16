@@ -3,17 +3,27 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import ReactPlayer from "react-player";
 import { OnProgressProps } from "react-player/base";
-import * as Slider from "@radix-ui/react-slider";
-import { PlayIcon } from "@/icons/Play";
-import { PauseIcon } from "@/icons/Pause";
-import { FullscreenIcon } from "@/icons/Fullscreen";
-import Duration from "@/components/Duration";
+import * as reactSlider from "@radix-ui/react-slider";
+
 import { ClientSideSuspense } from "@liveblocks/react";
 import { ThreadsTimeline } from "@/components/ThreadsTimeline";
-import { NewThreadComposer } from "@/components/NewThreadComposer";
-import { ExitFullscreenIcon } from "@/icons/ExitFullscreen";
 import { useUpdateMyPresence } from "@liveblocks/react/suspense";
 import { useKeyDownListener, useSkipToListener } from "@/utils";
+import {
+  PlayCircleOutlined,
+  PauseCircleOutlined,
+  SoundOutlined,
+  AudioMutedOutlined,
+  RetweetOutlined,
+  FullscreenOutlined,
+  FullscreenExitOutlined,
+  PlayCircleFilled,
+  PauseCircleFilled,
+  PauseOutlined,
+  SettingOutlined,
+} from "@ant-design/icons";
+import { Slider, Button, Dropdown, Menu } from "antd";
+import Duration from "./Duration";
 
 // 速度选项
 const SPEED_OPTIONS = [0.5, 0.75, 1, 1.5, 1.75, 2];
@@ -48,7 +58,6 @@ export function VideoPlayer({
 
   const updateMyPresence = useUpdateMyPresence();
 
-  // 更新多人协作状态
   useEffect(() => {
     if (seeking) {
       updateMyPresence({ state: "seeking" });
@@ -72,7 +81,6 @@ export function VideoPlayer({
     return (time / duration) * 100;
   }, [duration]);
 
-  // 使用 useEffect 将状态变化通知给父组件
   useEffect(() => {
     if (onStateChange) {
       onStateChange({
@@ -84,7 +92,6 @@ export function VideoPlayer({
     }
   }, [getCurrentPercentage, setPlaying, time, duration, onStateChange]);
 
-  // 播放时更新进度
   const handleProgress = useCallback(
     (progress: OnProgressProps) => {
       if (!seeking) {
@@ -94,14 +101,12 @@ export function VideoPlayer({
     [seeking]
   );
 
-  // 视频结束时停止播放
   const handleEnded = useCallback(() => {
     if (!loop) {
       setPlaying(false);
     }
   }, [loop]);
 
-  // 切换全屏
   const handleFullscreen = useCallback(() => {
     if (!playerWrapper.current) {
       return;
@@ -116,13 +121,11 @@ export function VideoPlayer({
     setFullscreen(requestFullscreen(playerWrapper.current));
   }, [fullscreen]);
 
-  // 拖动进度条时更新UI时间
   const handleSliderChange = useCallback(([value]: [number]) => {
     setSeeking(true);
     setTime(value);
   }, []);
 
-  // 拖动结束时更新视频时间
   const handleSliderCommit = useCallback(([value]: [number]) => {
     setTime(value);
     if (player.current) {
@@ -131,35 +134,19 @@ export function VideoPlayer({
     setSeeking(false);
   }, []);
 
-  // 处理音量变化
   const handleVolumeChange = useCallback(([value]: [number]) => {
     setVolume(value);
     setMuted(value === 0);
   }, []);
 
-  // 切换静音
   const toggleMute = useCallback(() => {
     setMuted(!muted);
   }, [muted]);
 
-  // 切换循环播放
   const toggleLoop = useCallback(() => {
     setLoop(!loop);
   }, [loop]);
 
-  // 更改播放速度
-  const handleSpeedChange = useCallback((speed: number) => {
-    setPlaybackSpeed(speed);
-    setShowSpeedMenu(false);
-  }, []);
-
-  // 更改视频质量
-  const handleQualityChange = useCallback((quality: string) => {
-    setQuality(quality);
-    setShowQualityMenu(false);
-  }, []);
-
-  // 监听跳转事件
   useSkipToListener((timePercentage) => {
     if (!player.current) {
       return;
@@ -172,43 +159,6 @@ export function VideoPlayer({
     player.current.seekTo(newTime);
   });
 
-  // 监听键盘事件
-  useKeyDownListener((event) => {
-    if (event.code === "Space") {
-      setPlaying(!playing);
-      return;
-    }
-
-    if (event.code === "KeyF") {
-      handleFullscreen();
-      return;
-    }
-
-    // 音量控制快捷键
-    if (event.code === "ArrowUp") {
-      setVolume(Math.min(1, volume + 0.1));
-      return;
-    }
-
-    if (event.code === "ArrowDown") {
-      setVolume(Math.max(0, volume - 0.1));
-      return;
-    }
-
-    // 静音快捷键
-    if (event.code === "KeyM") {
-      toggleMute();
-      return;
-    }
-
-    // 循环播放快捷键
-    if (event.code === "KeyL") {
-      toggleLoop();
-      return;
-    }
-  });
-
-  // 点击外部关闭下拉菜单
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (showSpeedMenu || showQualityMenu) {
@@ -233,249 +183,299 @@ export function VideoPlayer({
   }, [showSpeedMenu, showQualityMenu]);
 
   return (
-    <div className="relative w-full bg-black rounded-lg overflow-hidden">
-      <div className="relative w-full">
-        <div
-          ref={playerClickWrapper}
-          className="relative w-full pt-[80vh] bg-black" // 16:9 aspect ratio
-        >
-          <ClientSideSuspense fallback={null}>
-            <ReactPlayer
-              ref={player}
-              width="100%"
-              height="100%"
-              url={src}
-              playing={playing}
-              playbackRate={playbackSpeed}
-              volume={volume}
-              muted={muted}
-              loop={loop}
-              onProgress={handleProgress}
-              onEnded={handleEnded}
-              onDuration={setDuration}
-              className="absolute top-0 left-0"
-              onClick={() => setPlaying(!playing)}
-              onDoubleClick={handleFullscreen}
-            />
-          </ClientSideSuspense>
+    <div className="flex-1 min-h-0 size-full p-6 flex items-center justify-center">
+      <div
+        className="relative size-full flex items-center justify-center"
+        ref={playerWrapper}
+      >
+        <div className="size-full">
+          <div
+            ref={playerClickWrapper}
+            className="flex h-full w-full flex-col items-start justify-start pb-[92px]"
+          >
+            <div className="m-auto flex size-full select-none items-center justify-center overflow-hidden relative group">
+              <ClientSideSuspense fallback={null}>
+                <ReactPlayer
+                  ref={player}
+                  width="100%"
+                  height="100%"
+                  url={src}
+                  playing={playing}
+                  playbackRate={playbackSpeed}
+                  volume={volume}
+                  muted={muted}
+                  loop={loop}
+                  onProgress={handleProgress}
+                  onEnded={handleEnded}
+                  onDuration={setDuration}
+                  onClick={() => setPlaying(!playing)}
+                  onDoubleClick={handleFullscreen}
+                />
+              </ClientSideSuspense>
 
-          {/* Timeline */}
-          <div className="absolute bottom-0 left-0 right-0 px-4 flex flex-col bg-transparent">
-            <div className="relative h-[20px] w-full">
-              <ThreadsTimeline />
+              {/* 播放按钮 */}
+              {!playing && (
+                <div
+                  className="
+        absolute 
+        inset-0 
+        flex 
+        items-center 
+        justify-center 
+        z-10 
+      
+        opacity-100
+       
+        duration-300
+      "
+                >
+                  <button
+                    onClick={() => setPlaying(true)}
+                    className="
+          
+          backdrop-blur-sm 
+          rounded-full 
+          
+          
+          transition-all 
+          duration-300
+        "
+                  >
+                    <PlayCircleOutlined className="text-5xl text-white" />
+                  </button>
+                </div>
+              )}
             </div>
-            <div className="w-full h-1 bg-gray-800/50">
-              <Slider.Root
-                className="relative flex items-center h-full w-full"
-                value={[time]}
-                onValueChange={handleSliderChange}
-                onValueCommit={handleSliderCommit}
+
+            <div
+              className="absolute bottom-0 left-0 flex w-full flex-col items-center
+            justify-center"
+            >
+              <div className="relative h-[20px] w-full">
+                <ThreadsTimeline />
+              </div>
+              <Slider
+                style={{ margin: 0 }}
+                value={time}
                 max={1}
                 step={0.0001}
-              >
-                <Slider.Track className="bg-white/30 relative grow rounded-full h-full">
-                  <Slider.Range className="absolute bg-blue-500 rounded-full h-full" />
-                </Slider.Track>
-                <Slider.Thumb className="block w-3 h-3 bg-white rounded-full shadow-lg" />
-              </Slider.Root>
-            </div>
-          </div>
-        </div>
-
-        {/* 进度条 */}
-
-        {/* 视频设置区 */}
-        <div className="flex justify-between items-center px-4 py-2 bg-black/70 text-white">
-          {/* 左侧控制区 */}
-          <div className="flex items-center gap-3">
-            <button
-              className="bg-transparent border-none text-white cursor-pointer flex items-center justify-center p-1 rounded-full transition-colors hover:bg-white/20 min-w-6 min-h-6"
-              onClick={() => setPlaying(!playing)}
-            >
-              {playing ? <PauseIcon /> : <PlayIcon />}
-            </button>
-
-            <div className="flex items-center gap-3 ml-3">
-              {/* 音量控制 */}
-              <div className="relative h-6 group">
-                <button
-                  className="bg-transparent border-none text-white cursor-pointer flex items-center justify-center p-1 rounded-full transition-colors hover:bg-white/20 min-w-6 min-h-6"
-                  onClick={toggleMute}
-                >
-                  {muted ? (
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      {/* 静音图标 */}
-                    </svg>
-                  ) : (
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      {/* 音量图标 */}
-                    </svg>
-                  )}
-                </button>
-
-                {/* 音量滑块 */}
-                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 h-24 bg-black/80 rounded p-2 hidden group-hover:flex justify-center z-20">
-                  <Slider.Root
-                    className="relative flex items-center h-20 w-1.5"
-                    value={[volume]}
-                    onValueChange={handleVolumeChange}
-                    max={1}
-                    step={0.1}
-                    orientation="vertical"
+                onChange={(val) => {
+                  handleSliderChange([val]);
+                }}
+                onChangeComplete={(val) => {
+                  handleSliderCommit([val]);
+                }}
+                className="w-full"
+                tooltip={{ open: false }}
+              />
+              <div className="flex justify-between items-center py-2 text-white w-full">
+                {/* 左侧控制区 */}
+                <div className="flex items-center space-x-4">
+                  {/* 播放/暂停 */}
+                  <button
+                    onClick={() => setPlaying(!playing)}
+                    className="
+              rounded-md   
+    p-2
+    transition-all 
+    duration-300 
+    flex 
+    items-center 
+    justify-center 
+    hover:bg-white/10 
+  "
                   >
-                    <Slider.Track className="bg-white/30 relative grow rounded-full h-full">
-                      <Slider.Range className="absolute bg-blue-500 rounded-full h-full" />
-                    </Slider.Track>
-                    <Slider.Thumb className="block w-3 h-3 bg-white rounded-full shadow-lg" />
-                  </Slider.Root>
+                    {!playing ? (
+                      <PlayCircleOutlined
+                        className="
+                 text-gray-11
+      text-2xl "
+                      />
+                    ) : (
+                      <PauseOutlined className="text-gray-11 text-2xl" />
+                    )}
+                  </button>
+
+                  {/* 循环播放 */}
+
+                  <button
+                    onClick={() => setLoop(!loop)}
+                    className="
+              rounded-md   
+    p-2
+    transition-all 
+    duration-300 
+    flex 
+    items-center 
+    justify-center 
+    hover:bg-white/10 
+  "
+                  >
+                    <RetweetOutlined
+                      className={`${!loop ? "text-gray-11" : "text-accent"} text-2xl`}
+                    />
+                  </button>
+                  {/* 播放速度 */}
+                  <Dropdown
+                    menu={{
+                      items: [
+                        {
+                          extra: <h3>SPEED</h3>,
+                          key: "title",
+                          // label: `SPEED`,
+                          // type: "extra",
+                          // onClick: () =>,
+                        },
+                        ...SPEED_OPTIONS.map((speed) => ({
+                          key: speed,
+                          label: `${speed}x`,
+                          onClick: () => setPlaybackSpeed(speed),
+                        })),
+                      ],
+                      selectedKeys: [playbackSpeed.toString()],
+                      theme: "dark",
+                    }}
+                    placement="topRight"
+                  >
+                    <button
+                      className="
+      text-gray-11
+      rounded-md   
+      min-w-[35px]
+      min-h-[35px]
+      transition-all 
+      duration-300 
+      flex 
+      items-center 
+      justify-center 
+      hover:bg-white/10 
+    "
+                    >
+                      {playbackSpeed}x
+                    </button>
+                  </Dropdown>
+
+                  {/* 时间显示 */}
+                  {/* <div className="text-sm"> */}
+                  {player.current ? (
+                    <div>
+                      <Duration seconds={duration * time} /> /{" "}
+                      <Duration seconds={duration} />
+                    </div>
+                  ) : null}
+                  {/* </div> */}
+                </div>
+
+                {/* 右侧控制区 */}
+                <div className="flex items-center space-x-4">
+                  {/* 音量控制 */}
+                  <Dropdown
+                    dropdownRender={() => (
+                      <div
+                        className="bg-white/10 p-4 rounded-lg shadow-lg"
+                        style={{
+                          height: 150,
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Slider
+                          vertical
+                          value={volume * 100} // 显示时乘以 100
+                          onChange={(value) => setVolume(value / 100)} // 设置时除以 100
+                          min={0}
+                          max={100}
+                          style={{ height: 120 }}
+                        />
+                      </div>
+                    )}
+                  >
+                    <button
+                      onClick={() => setMuted(!muted)}
+                      className="
+              rounded-md   
+    p-2
+    transition-all 
+    duration-300 
+    flex 
+    items-center 
+    justify-center 
+    hover:bg-white/10 
+  "
+                    >
+                      {muted ? (
+                        <AudioMutedOutlined className="text-2xl text-gray-11" />
+                      ) : (
+                        <SoundOutlined className="text-2xl text-gray-11" />
+                      )}
+                    </button>
+                  </Dropdown>
+
+                  {/* 视频质量 */}
+                  <Dropdown
+                    menu={{
+                      items: [
+                        {
+                          extra: <h3>QUALITY</h3>,
+                          key: "title",
+                        },
+                        ...QUALITY_OPTIONS.map((quality) => ({
+                          key: quality,
+                          label: `${quality}`,
+                          onClick: () => setQuality(quality),
+                        })),
+                      ],
+                      selectedKeys: [quality.toString()],
+                      theme: "dark",
+                    }}
+                    placement="topRight"
+                  >
+                    <button
+                      className="
+      text-gray-11
+      rounded-md   
+      min-w-[35px]
+      min-h-[35px]
+      transition-all 
+      duration-300 
+      flex 
+      items-center 
+      justify-center 
+      hover:bg-white/10 
+    "
+                    >
+                      <SettingOutlined className="text-2xl text-gray-11" />
+                    </button>
+                  </Dropdown>
+
+                  {/* 全屏切换 */}
+                  <button
+                    onClick={handleFullscreen}
+                    className="
+      text-gray-11
+      rounded-md   
+      min-w-[35px]
+      min-h-[35px]
+      transition-all 
+      duration-300 
+      flex 
+      items-center 
+      justify-center 
+      hover:bg-white/10 
+    "
+                  >
+                    {fullscreen ? (
+                      <FullscreenExitOutlined className="text-2xl text-gray-11" />
+                    ) : (
+                      <FullscreenOutlined className="text-2xl text-gray-11" />
+                    )}
+                  </button>
                 </div>
               </div>
-
-              {/* 水平音量滑块 */}
-              <div className="w-16 h-6 flex items-center">
-                <Slider.Root
-                  className="relative flex items-center h-1.5 w-full"
-                  value={[volume]}
-                  onValueChange={handleVolumeChange}
-                  max={1}
-                  step={0.1}
-                >
-                  <Slider.Track className="bg-white/30 relative grow rounded-full h-full">
-                    <Slider.Range className="absolute bg-blue-500 rounded-full h-full" />
-                  </Slider.Track>
-                  <Slider.Thumb className="block w-3 h-3 bg-white rounded-full shadow-lg" />
-                </Slider.Root>
-              </div>
-            </div>
-
-            {/* 时间显示 */}
-            <div className="flex items-center gap-1.5 text-sm">
-              <Duration seconds={duration * time} />
-              <span>/</span>
-              <Duration seconds={duration} />
             </div>
           </div>
 
-          {/* 右侧控制区 */}
-          <div className="flex items-center gap-3">
-            {/* 播放速度控制 */}
-            <div className="relative h-6 speed-control">
-              <button
-                className="bg-transparent border-none text-white cursor-pointer flex items-center justify-center p-1 rounded-full transition-colors hover:bg-white/20 min-w-6 min-h-6"
-                onClick={() => setShowSpeedMenu(!showSpeedMenu)}
-              >
-                {playbackSpeed}x
-              </button>
-              {showSpeedMenu && (
-                <div className="absolute bottom-8 left-0 bg-black/80 rounded p-1 z-50">
-                  {SPEED_OPTIONS.map((speed) => (
-                    <button
-                      key={speed}
-                      className={`
-                    block 
-                    w-full 
-                    px-2 
-                    py-1 
-                    text-sm 
-                    text-left 
-                    rounded 
-                    hover:bg-white/20 
-                    ${speed === playbackSpeed ? "text-blue-500" : "text-white"}
-                  `}
-                      onClick={() => handleSpeedChange(speed)}
-                    >
-                      {speed}x
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* 视频质量控制 */}
-            <div className="relative h-6 quality-control">
-              <button
-                className="bg-transparent border-none text-white cursor-pointer flex items-center justify-center p-1 rounded-full transition-colors hover:bg-white/20 min-w-6 min-h-6"
-                onClick={() => setShowQualityMenu(!showQualityMenu)}
-              >
-                {quality}
-              </button>
-              {showQualityMenu && (
-                <div className="absolute bottom-8 left-0 bg-black/80 rounded p-1 z-50">
-                  {QUALITY_OPTIONS.map((q) => (
-                    <button
-                      key={q}
-                      className={`
-                    block 
-                    w-full 
-                    px-2 
-                    py-1 
-                    text-sm 
-                    text-left 
-                    rounded 
-                    hover:bg-white/20 
-                    ${q === quality ? "text-blue-500" : "text-white"}
-                  `}
-                      onClick={() => handleQualityChange(q)}
-                    >
-                      {q}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* 循环播放 */}
-            <button
-              className={`
-            bg-transparent 
-            border-none 
-            cursor-pointer 
-            flex 
-            items-center 
-            justify-center 
-            p-1 
-            rounded-full 
-            transition-colors 
-            hover:bg-white/20 
-            min-w-6 
-            min-h-6 
-            ${loop ? "text-blue-500" : "text-white"}
-          `}
-              onClick={toggleLoop}
-            >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                />
-              </svg>
-            </button>
-
-            {/* 全屏切换 */}
-            <button
-              className="bg-transparent border-none text-white cursor-pointer flex items-center justify-center p-1 rounded-full transition-colors hover:bg-white/20 min-w-6 min-h-6"
-              onClick={handleFullscreen}
-            >
-              {fullscreen ? <ExitFullscreenIcon /> : <FullscreenIcon />}
-            </button>
-          </div>
+          {/* 视频设置区 */}
         </div>
       </div>
     </div>

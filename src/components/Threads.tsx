@@ -38,7 +38,6 @@ function ThreadList({
   status: string;
 }) {
   const { threads } = useThreads();
-  console.log("--threads", threads);
   const filteredThreads = threads.filter((thread) => {
     // First filter by resourceId
     if (thread.metadata.resourceId !== resourceId) return false;

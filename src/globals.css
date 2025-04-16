@@ -167,3 +167,12 @@ video {
   outline: 2px solid var(--lb-accent);
   z-index: 1;
 }
+
+/* 自定义 Slider 样式 */
+.custom-slider .ant-slider-track {
+  background-color: #3b82f6 !important; /* 进度条颜色 (蓝色) */
+}
+
+.custom-slider .ant-slider-rail {
+  background-color: #e5e7eb !important; /* 背景颜色 (浅灰) */
+}

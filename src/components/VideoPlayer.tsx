@@ -21,6 +21,7 @@ import {
   PauseCircleFilled,
   PauseOutlined,
   SettingOutlined,
+  CaretRightOutlined,
 } from "@ant-design/icons";
 import { Slider, Button, Dropdown, Menu } from "antd";
 import Duration from "./Duration";
@@ -183,7 +184,7 @@ export function VideoPlayer({
   }, [showSpeedMenu, showQualityMenu]);
 
   return (
-    <div className="flex-1 min-h-0 size-full p-6 flex items-center justify-center">
+    <div className="flex-1 min-h-0 size-full pt-6 px-6 flex items-center justify-center">
       <div
         className="relative size-full flex items-center justify-center"
         ref={playerWrapper}
@@ -215,46 +216,35 @@ export function VideoPlayer({
 
               {/* 播放按钮 */}
               {!playing && (
-                <div
-                  className="
-        absolute 
-        inset-0 
-        flex 
-        items-center 
-        justify-center 
-        z-10 
-      
-        opacity-100
-       
-        duration-300
-      "
-                >
+                <div className="absolute inset-0 flex items-center justify-center z-10 opacity-100 duration-300">
                   <button
                     onClick={() => setPlaying(true)}
-                    className="
-          
-          backdrop-blur-sm 
-          rounded-full 
-          
-          
-          transition-all 
-          duration-300
-        "
+                    className="flex items-center justify-center bg-white/30 backdrop-blur-sm rounded-full w-16 h-16 hover:bg-white/50 transition-all duration-300"
                   >
-                    <PlayCircleOutlined className="text-5xl text-white" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="32"
+                      height="32"
+                      viewBox="0 0 24 24"
+                      fill="white"
+                      className="text-5xl"
+                      style={{
+                        filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.3))",
+                      }}
+                    >
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
                   </button>
                 </div>
               )}
             </div>
 
-            <div
-              className="absolute bottom-0 left-0 flex w-full flex-col items-center
-            justify-center"
-            >
+            <div className="absolute bottom-0 left-0 flex w-full flex-col items-center justify-center">
               <div className="relative h-[20px] w-full">
                 <ThreadsTimeline />
               </div>
               <Slider
+                className="custom-slider w-full"
                 style={{ margin: 0 }}
                 value={time}
                 max={1}
@@ -265,34 +255,20 @@ export function VideoPlayer({
                 onChangeComplete={(val) => {
                   handleSliderCommit([val]);
                 }}
-                className="w-full"
                 tooltip={{ open: false }}
               />
               <div className="flex justify-between items-center py-2 text-white w-full">
                 {/* 左侧控制区 */}
-                <div className="flex items-center space-x-4">
+                <div className="flex-1 text-left flex items-center space-x-4">
                   {/* 播放/暂停 */}
                   <button
                     onClick={() => setPlaying(!playing)}
-                    className="
-              rounded-md   
-    p-2
-    transition-all 
-    duration-300 
-    flex 
-    items-center 
-    justify-center 
-    hover:bg-white/10 
-  "
+                    className="rounded-md w-12 h-12 transition-all duration-300 flex items-center justify-center  hover:bg-white/10"
                   >
                     {!playing ? (
-                      <PlayCircleOutlined
-                        className="
-                 text-gray-11
-      text-2xl "
-                      />
+                      <PlayCircleOutlined className="text-2xl" />
                     ) : (
-                      <PauseOutlined className="text-gray-11 text-2xl" />
+                      <PauseOutlined className="text-2xl" />
                     )}
                   </button>
 
@@ -300,19 +276,10 @@ export function VideoPlayer({
 
                   <button
                     onClick={() => setLoop(!loop)}
-                    className="
-              rounded-md   
-    p-2
-    transition-all 
-    duration-300 
-    flex 
-    items-center 
-    justify-center 
-    hover:bg-white/10 
-  "
+                    className="rounded-md w-12 h-12 transition-all duration-300 flex items-center justify-center  hover:bg-white/10"
                   >
                     <RetweetOutlined
-                      className={`${!loop ? "text-gray-11" : "text-accent"} text-2xl`}
+                      className={`${!loop ? "" : "text-accent"} text-2xl`}
                     />
                   </button>
                   {/* 播放速度 */}
@@ -335,39 +302,26 @@ export function VideoPlayer({
                       selectedKeys: [playbackSpeed.toString()],
                       theme: "dark",
                     }}
-                    placement="topRight"
+                    placement="topLeft"
+                    trigger={["click"]}
                   >
-                    <button
-                      className="
-      text-gray-11
-      rounded-md   
-      min-w-[35px]
-      min-h-[35px]
-      transition-all 
-      duration-300 
-      flex 
-      items-center 
-      justify-center 
-      hover:bg-white/10 
-    "
-                    >
+                    <button className="text-xl rounded-md w-12 h-12 transition-all duration-300 flex items-center justify-center  hover:bg-white/10">
                       {playbackSpeed}x
                     </button>
                   </Dropdown>
-
-                  {/* 时间显示 */}
-                  {/* <div className="text-sm"> */}
-                  {player.current ? (
-                    <div>
-                      <Duration seconds={duration * time} /> /{" "}
-                      <Duration seconds={duration} />
-                    </div>
-                  ) : null}
-                  {/* </div> */}
                 </div>
 
+                {/* 时间显示 */}
+
+                {player.current ? (
+                  <div className="flex-1 flex justify-center text-lg">
+                    <Duration seconds={duration * time} /> /{" "}
+                    <Duration seconds={duration} />
+                  </div>
+                ) : null}
+
                 {/* 右侧控制区 */}
-                <div className="flex items-center space-x-4">
+                <div className="flex-1 flex items-center justify-end space-x-4">
                   {/* 音量控制 */}
                   <Dropdown
                     dropdownRender={() => (
@@ -392,21 +346,12 @@ export function VideoPlayer({
                   >
                     <button
                       onClick={() => setMuted(!muted)}
-                      className="
-              rounded-md   
-    p-2
-    transition-all 
-    duration-300 
-    flex 
-    items-center 
-    justify-center 
-    hover:bg-white/10 
-  "
+                      className="rounded-md w-12 h-12 transition-all duration-300 flex items-center justify-center  hover:bg-white/10"
                     >
                       {muted ? (
-                        <AudioMutedOutlined className="text-2xl text-gray-11" />
+                        <AudioMutedOutlined className="text-2xl" />
                       ) : (
-                        <SoundOutlined className="text-2xl text-gray-11" />
+                        <SoundOutlined className="text-2xl" />
                       )}
                     </button>
                   </Dropdown>
@@ -430,52 +375,26 @@ export function VideoPlayer({
                     }}
                     placement="topRight"
                   >
-                    <button
-                      className="
-      text-gray-11
-      rounded-md   
-      min-w-[35px]
-      min-h-[35px]
-      transition-all 
-      duration-300 
-      flex 
-      items-center 
-      justify-center 
-      hover:bg-white/10 
-    "
-                    >
-                      <SettingOutlined className="text-2xl text-gray-11" />
+                    <button className="rounded-md w-12 h-12 transition-all duration-300 flex items-center justify-center  hover:bg-white/10">
+                      <SettingOutlined className="text-2xl" />
                     </button>
                   </Dropdown>
 
                   {/* 全屏切换 */}
                   <button
                     onClick={handleFullscreen}
-                    className="
-      text-gray-11
-      rounded-md   
-      min-w-[35px]
-      min-h-[35px]
-      transition-all 
-      duration-300 
-      flex 
-      items-center 
-      justify-center 
-      hover:bg-white/10 
-    "
+                    className="rounded-md w-12 h-12 transition-all duration-300 flex items-center justify-center  hover:bg-white/10"
                   >
                     {fullscreen ? (
-                      <FullscreenExitOutlined className="text-2xl text-gray-11" />
+                      <FullscreenExitOutlined className="text-2xl" />
                     ) : (
-                      <FullscreenOutlined className="text-2xl text-gray-11" />
+                      <FullscreenOutlined className="text-2xl" />
                     )}
                   </button>
                 </div>
               </div>
             </div>
           </div>
-
-          {/* 视频设置区 */}
         </div>
       </div>
     </div>

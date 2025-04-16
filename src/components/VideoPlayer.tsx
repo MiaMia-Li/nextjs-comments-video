@@ -34,9 +34,11 @@ const QUALITY_OPTIONS = ["Auto", "180p", "540p", "720p", "1080p"];
 export function VideoPlayer({
   onStateChange,
   src,
+  resourceId,
 }: {
   onStateChange: (p: any) => void;
   src: string;
+  resourceId: string;
 }) {
   const player = useRef<ReactPlayer>(null);
   const playerWrapper = useRef(null);
@@ -135,19 +137,6 @@ export function VideoPlayer({
     setSeeking(false);
   }, []);
 
-  const handleVolumeChange = useCallback(([value]: [number]) => {
-    setVolume(value);
-    setMuted(value === 0);
-  }, []);
-
-  const toggleMute = useCallback(() => {
-    setMuted(!muted);
-  }, [muted]);
-
-  const toggleLoop = useCallback(() => {
-    setLoop(!loop);
-  }, [loop]);
-
   useSkipToListener((timePercentage) => {
     if (!player.current) {
       return;
@@ -241,7 +230,7 @@ export function VideoPlayer({
 
             <div className="absolute bottom-0 left-0 flex w-full flex-col items-center justify-center">
               <div className="relative h-[20px] w-full">
-                <ThreadsTimeline />
+                <ThreadsTimeline resourceId={resourceId} />
               </div>
               <Slider
                 className="custom-slider w-full"

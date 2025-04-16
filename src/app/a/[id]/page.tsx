@@ -18,10 +18,11 @@ import {
 } from "@radix-ui/react-icons";
 import {
   ArrowRightOutlined,
+  DownOutlined,
   MenuUnfoldOutlined,
   VerticalLeftOutlined,
 } from "@ant-design/icons";
-import { Dropdown, Tooltip } from "antd";
+import { Dropdown, Space, Tooltip } from "antd";
 
 type ResourceType = "video" | "audio" | "image";
 type Resource = {
@@ -75,6 +76,7 @@ export default function Home() {
   const [currentSidebarTab, setCurrentSidebarTab] = useState<string | null>(
     null
   );
+  const [selectedFilter, setSelectedFilter] = useState("All");
 
   useEffect(() => {
     const resourceIndex = data.findIndex((item) => item.id === id);
@@ -114,15 +116,63 @@ export default function Home() {
       </div>
     );
   }
+  const items = [
+    {
+      key: "all",
+      label: "All comments",
+    },
+    {
+      key: "open",
+      label: "Open comments",
+    },
+    {
+      key: "resolved",
+      label: "Resolved comments",
+    },
+  ];
+
+  const handleMenuClick = (e) => {
+    const selected = items.find((item) => item.key === e.key);
+    if (selected) {
+      setSelectedFilter(
+        selected.key === "all"
+          ? "All"
+          : selected.key === "open"
+            ? "Open"
+            : "Resolved"
+      );
+    }
+  };
 
   const sidebarNavItems = [
     {
       id: "comments",
       icon: <ChatBubbleIcon className="w-6 h-6" />,
       name: "Comments",
+      header: (
+        <div>
+          <Dropdown
+            menu={{
+              items,
+              theme: "dark",
+              onClick: handleMenuClick,
+            }}
+            placement="bottomLeft"
+            trigger={["click"]}
+          >
+            <button
+              onClick={(e) => e.preventDefault()}
+              className="flex items-center space-x-2 hover:bg-white/10 px-2 rounded-md"
+            >
+              <span>{selectedFilter}</span>
+              <DownOutlined className="w-3 h-3" />
+            </button>
+          </Dropdown>
+        </div>
+      ),
       component: (
         <div>
-          <Threads resourceId={currentResource.id} />
+          <Threads resourceId={currentResource.id} status={selectedFilter} />
           <ClientSideSuspense fallback={<Loading />}>
             <NewThreadComposer
               resourceType={currentResource.type}
@@ -140,18 +190,21 @@ export default function Home() {
       icon: <LayoutIcon className="w-6 h-6" />,
       name: "Board",
       component: <div>Board Content</div>,
+      header: null,
     },
     {
       id: "files",
       icon: <FileIcon className="w-6 h-6" />,
       name: "Files",
       component: <div>Files Content</div>,
+      header: null,
     },
     {
       id: "info",
       icon: <InfoCircledIcon className="w-6 h-6" />,
       name: "Info",
       component: <div>Info Content</div>,
+      header: null,
     },
   ];
 
@@ -186,6 +239,7 @@ export default function Home() {
                     case "audio":
                       return (
                         <VideoPlayer
+                          resourceId={currentResource.id}
                           src={currentResource.url}
                           onStateChange={handleVideoStateChange}
                         />
@@ -212,20 +266,29 @@ export default function Home() {
               {/* Expanded Sidebar Content - Appears to the left of navigation */}
               {currentSidebarTab && (
                 <div className="w-80 bg-gray-2 border-l border-gray-4 overflow-y-auto">
-                  <div className="flex justify-between items-center p-4 border-b border-gray-4">
-                    <h2 className="text-lg font-semibold">
+                  <div className="p-4 border-b border-gray-4">
+                    <div className="flex justify-between items-center">
+                      <h2 className="text-lg font-semibold">
+                        {
+                          sidebarNavItems.find(
+                            (item) => item.id === currentSidebarTab
+                          )?.name
+                        }
+                      </h2>
+                      <button
+                        onClick={() => setCurrentSidebarTab(null)}
+                        className="hover:bg-white/10 p-2 rounded"
+                      >
+                        <MenuUnfoldOutlined />
+                      </button>
+                    </div>
+                    <div>
                       {
                         sidebarNavItems.find(
                           (item) => item.id === currentSidebarTab
-                        )?.name
+                        )?.header
                       }
-                    </h2>
-                    <button
-                      onClick={() => setCurrentSidebarTab(null)}
-                      className="hover:bg-white/10 p-2 rounded"
-                    >
-                      <MenuUnfoldOutlined />
-                    </button>
+                    </div>
                   </div>
                   <div className="py-4">
                     {

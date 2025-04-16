@@ -17,20 +17,20 @@ import { Link } from "@/components/Link";
 import { useState } from "react";
 import { useParams } from "next/navigation";
 
-export function ThreadsTimeline() {
+export function ThreadsTimeline({ resourceId }: { resourceId: string }) {
   return (
     <ErrorBoundary fallback={<div>Error</div>}>
       <ClientSideSuspense fallback={null}>
-        <PinnedThreads />
+        <PinnedThreads resourceId={resourceId} />
       </ClientSideSuspense>
     </ErrorBoundary>
   );
 }
 
-function PinnedThreads() {
+function PinnedThreads({ resourceId }: { resourceId: string }) {
   const { threads } = useThreads();
-  const params = useParams();
-  const resourceId = params.id;
+  // const params = useParams();
+  // const resourceId = params.id;
 
   // 根据 resourceId 过滤线程
   const filteredThreads = threads.filter(

@@ -16,19 +16,39 @@ import { formatTime } from "@/components/Duration";
 import { TimeIcon } from "@/icons/Time";
 import { Loading } from "./Loading";
 
-export function Threads({ resourceId }: { resourceId: string }) {
+export function Threads({
+  resourceId,
+  status,
+}: {
+  resourceId: string;
+  status: string;
+}) {
   return (
     <ClientSideSuspense fallback={<Loading />}>
-      <ThreadList resourceId={resourceId} />
+      <ThreadList resourceId={resourceId} status={status} />
     </ClientSideSuspense>
   );
 }
 
-function ThreadList({ resourceId }: { resourceId: string }) {
+function ThreadList({
+  resourceId,
+  status,
+}: {
+  resourceId: string;
+  status: string;
+}) {
   const { threads } = useThreads();
-  const filteredThreads = threads.filter(
-    (thread) => thread.metadata.resourceId === resourceId
-  );
+  console.log("--threads", threads);
+  const filteredThreads = threads.filter((thread) => {
+    // First filter by resourceId
+    if (thread.metadata.resourceId !== resourceId) return false;
+
+    if (status === "Open") return !thread.resolved;
+    if (status === "Resolved") return thread.resolved;
+
+    // If selectedFilter is 'All', include all threads for this resource
+    return true;
+  });
 
   if (threads.length === 0) {
     return <div className={styles.emptyState}>No comments yet!</div>;
